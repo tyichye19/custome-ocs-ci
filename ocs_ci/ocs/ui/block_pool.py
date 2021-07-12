@@ -7,6 +7,7 @@ from ocs_ci.utility.utils import get_ocp_version, get_running_ocp_version
 from selenium.webdriver.common.by import By
 
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -36,6 +37,12 @@ class BlockPoolUI(PageNavigator):
         self.do_click(self.bp_loc["actions_inside_pool"])
         self.do_click(self.bp_loc["delete_pool_inside_pool"])
         self.do_click(self.bp_loc["confirm_delete_inside_pool"])
+
+    def check_pool_existence(self, pool_name):
+        self.navigate_block_pool_page()
+        time.sleep(5)
+        pool_existence = self.check_element_text(expected_text=pool_name)
+        logger.info(f"Pool name {pool_name} is {pool_existence}")
 
 
 

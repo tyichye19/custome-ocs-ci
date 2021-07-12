@@ -27,4 +27,6 @@ class TestPvcUserInterface(object):
         block_pool_ui_object = BlockPoolUI(setup_ui)
         pool_name = create_unique_resource_name("test", "rbd-pool")
         block_pool_ui_object.create_pool(pool_name, self.replica, self.compression)
+        block_pool_ui_object.check_pool_existence(pool_name)
         block_pool_ui_object.delete_pool(pool_name)
+        block_pool_ui_object.check_pool_existence(pool_name)
