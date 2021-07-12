@@ -406,6 +406,15 @@ class PageNavigator(BaseUI):
         self.choose_expanded_mode(mode=True, locator=self.page_nav["Workloads"])
         self.do_click(locator=self.page_nav["Pods"])
 
+    def navigate_block_pool_page(self):
+        """
+        Navigate to block pools page
+         
+        """
+        logger.info("Navigate to block pools page")
+        self.navigate_to_ocs_operator_page()
+        self.do_click(locator=self.page_nav["block_pool_link"])
+
     def verify_current_page_resource_status(self, status_to_check, timeout=30):
         """
         Compares a given status string to the one shown in the resource's UI page
