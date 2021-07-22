@@ -25,6 +25,7 @@ from ocs_ci.utility.utils import (
     get_ocp_version,
     run_cmd,
 )
+from contextlib import contextmanager
 
 logger = logging.getLogger(__name__)
 
@@ -164,6 +165,43 @@ class BaseUI:
             f"//{element}[contains(text(), '{expected_text}')]"
         )
         return len(element_list) > 0
+
+    def wait_for_element_text(self, locator, expected_text, timeout=10):
+        """
+        Wait for text to be present inside element within timeout
+        Args:
+            locator (set): (GUI element needs to operate on (str), type (By)).
+            expected_text (string): The expected text.
+            timeout (int): time to wait for expected text to be present.
+        Return:
+            bool: True is expected text was found within timeout, False otherwise.
+
+        """
+        wait = WebDriverWait(self.driver, timeout)
+        try:
+            wait.until(ec.text_to_be_present_in_element((locator[1], locator[0]), expected_text))
+            return True
+        except TimeoutException as e:
+            self.take_screenshot()
+            logger.error(f"Locator {locator[1]} {locator[0]} did not find text {expected_text}")
+            return False
+
+    def get_element_text(self, locator):
+        """
+        Get the inner text of an element in locator.
+        Args:
+            locator (set): (GUI element needs to operate on (str), type (By)).
+        Return:
+            str: The text captured.
+        """
+        return self.driver.find_element(by=locator[1], value=locator[0]).text
+
+    @contextmanager
+    def wait_for_page_readiness(self, timeout=10):
+        logger.info("Waiting for page to load at {}.".format(self.driver.current_url))
+        old_page = self.driver.find_element_by_tag_name('html')
+        yield
+        WebDriverWait(self, timeout).until(staleness_of(old_page))
 
     def refresh_page(self):
         """
@@ -414,6 +452,7 @@ class PageNavigator(BaseUI):
         logger.info("Navigate to block pools page")
         self.navigate_to_ocs_operator_page()
         self.do_click(locator=self.page_nav["block_pool_link"])
+
 
     def verify_current_page_resource_status(self, status_to_check, timeout=30):
         """

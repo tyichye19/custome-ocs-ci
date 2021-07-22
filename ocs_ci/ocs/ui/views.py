@@ -388,6 +388,61 @@ block_pool = {
         "//button[text()='Delete']",
         By.XPATH
     ),
+    "replica_dropdown_edit": (
+        'button[data-test="replica-dropdown"]',
+        By.CSS_SELECTOR
+    ),
+    "compression_checkbox_edit": (
+        'input[data-test="compression-checkbox"]',
+        By.CSS_SELECTOR
+    ),
+    "save_pool_edit": (
+        "Save", By.LINK_TEXT
+    ),
+    "pool_state_inside_pool": (
+        'span[data-test="status-text"]',
+        By.CSS_SELECTOR
+    ),
+}
+
+storageclass = {
+    "create_storageclass_button": (
+        "Create StorageClass",
+        By.LINK_TEXT
+    ),
+    "input_storageclass_name": (
+        'input[id="storage-class-name"]',
+        By.CSS_SELECTOR
+    ),
+    "provisioner_dropdown": (
+        'button[data-test="storage-class-provisioner-dropdown"]',
+        By.CSS_SELECTOR
+    ),
+    "rbd_provisioner": (
+        "openshift-storage.rbd.csi.ceph.com",
+        By.LINK_TEXT
+    ),
+    "pool_dropdown": (
+        'button[id="pool-dropdown-id"]',
+        By.CSS_SELECTOR
+    ),
+    "save_storageclass": (
+        'button[id="save-changes"]',
+        By.CSS_SELECTOR
+    ),
+    "action_inside_storageclass": (
+        'button[data-test-id="actions-menu-button"]',
+        By.CSS_SELECTOR
+    ),
+    "delete_inside_storageclass": (
+        'button[data-test-action="Delete StorageClass"]',
+        By.CSS_SELECTOR
+    ),
+    "confirm_delete_inside_storageclass": (
+        "//button[text()='Delete']",
+        By.XPATH
+    ),
+
 }
 
 validation_4_7 = {
@@ -424,6 +479,7 @@ locators = {
         "mcg_stores": mcg_stores,
         "pvc": {**pvc, **pvc_4_7, **pvc_4_8},
         "block_pool": block_pool,
+        "storageclass": storageclass,
         "infra": infra,
         "validation": {**validation, **validation_4_8},
     },
