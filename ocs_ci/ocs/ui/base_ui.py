@@ -20,7 +20,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from ocs_ci.framework import config
 from ocs_ci.framework import config as ocsci_config
 from ocs_ci.ocs import constants
-from ocs_ci.ocs.exceptions import TimeoutExpiredError
+from ocs_ci.ocs.exceptions import TimeoutExpiredError, PageNotLoaded
 from ocs_ci.ocs.ui.views import locators
 from ocs_ci.utility.retry import retry
 from ocs_ci.utility.utils import (
@@ -168,6 +168,56 @@ class BaseUI:
             f"//{element}[contains(text(), '{expected_text}')]"
         )
         return len(element_list) > 0
+
+    def get_element_text(self, locator):
+        """
+        Get the inner text of an element in locator.
+
+        Args:
+            locator (set): (GUI element needs to operate on (str), type (By)).
+
+        Return:
+            str: The text captured.
+        """
+        return self.driver.find_element(by=locator[1], value=locator[0]).text
+
+    def page_has_loaded(self, retries=5, sleep_time=1):
+        """
+        Waits for page to completely load by comparing current page hash values.
+        Not suitable for pages that use frequent dynamically content (less than sleep_time)
+
+        Args:
+            retries (int): How much time in sleep_time to wait for page to load
+            sleep_time (int): Time to wait between every pool of dom hash
+
+        """
+        def get_page_hash():
+            """
+            Get dom html hash
+            """
+            dom = self.driver.find_element_by_tag_name("html").get_attribute(
+                "innerHTML"
+            )
+            dom_hash = hash(dom.encode("utf-8"))
+            return dom_hash
+
+        page_hash = "empty"
+        page_hash_new = ""
+
+        # comparing old and new page DOM hash together to verify the page is fully loaded
+        retry_counter = 0
+        while page_hash != page_hash_new:
+            if retry_counter > 0:
+                logger.info(f"page not loaded yet: {self.driver.current_url}")
+            retry_counter += 1
+            page_hash = get_page_hash()
+            time.sleep(sleep_time)
+            page_hash_new = get_page_hash()
+            if retry_counter == retries:
+                raise PageNotLoaded(
+                    f"Current URL did not finish loading in {retries*sleep_time}"
+                )
+        logger.info(f"page loaded: {self.driver.current_url}")
 
     def refresh_page(self):
         """
@@ -483,6 +533,15 @@ class PageNavigator(BaseUI):
         logger.info("Navigate to Pods Page")
         self.choose_expanded_mode(mode=True, locator=self.page_nav["Workloads"])
         self.do_click(locator=self.page_nav["Pods"], enable_screenshot=False)
+
+    def navigate_block_pool_page(self):
+        """
+        Navigate to block pools page
+
+        """
+        logger.info("Navigate to block pools page")
+        self.navigate_to_ocs_operator_page()
+        self.do_click(locator=self.page_nav["block_pool_link"])
 
     def verify_current_page_resource_status(self, status_to_check, timeout=30):
         """

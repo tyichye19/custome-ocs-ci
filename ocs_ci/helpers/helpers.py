@@ -35,7 +35,7 @@ from ocs_ci.ocs.exceptions import (
     UnavailableBuildException,
     UnexpectedBehaviour,
 )
-from ocs_ci.ocs.ocp import OCP
+from ocs_ci.ocs.ocp import OCP, get_all_resource_of_kind_containing_string
 from ocs_ci.ocs.resources import pod, pvc
 from ocs_ci.ocs.resources.ocs import OCS
 from ocs_ci.utility import templating
@@ -833,6 +833,74 @@ def validate_cephfilesystem(fs_name):
         pass
 
     return True if (ceph_validate and ocp_validate) else False
+
+
+def delete_all_resource_of_kind_containing_string(kind, search_string):
+    """
+    Delete all resource of kind specified with name containing search_string.
+
+    Args:
+        kind (str): kind of the resource to search and delete like CephBlockPool, pvc.
+        search_string (str): Search string for the resources to be searched and deleted.
+
+    Returns
+        bool: True if deletion of all resource succeeded else false.
+
+    """
+    resource_dict_list = get_all_resource_of_kind_containing_string(
+        kind=kind, search_string=search_string
+    )
+    if len(resource_dict_list) > 0:
+        for resource in resource_dict_list:
+            OCS(**resource).delete()
+        resource_dict_after_list = get_all_resource_of_kind_containing_string(
+            kind=kind, search_string=search_string
+        )
+        if len(resource_dict_after_list) > 0:
+            for resource in resource_dict_after_list:
+                logger.error(
+                    f"Resource {resource.resource_name} was not deleted successfully"
+                )
+            return False
+        else:
+            return True
+    return True
+
+
+def create_ocs_object_from_kind_and_name(kind, resource_name):
+    """
+    Create OCS object from kind and name
+
+    Args:
+        kind (str): resource kind like CephBlockPool, pvc.
+        resource_name (str): name of the resource.
+
+    Returns:
+        ocs_ci.ocs.resources.ocs.OCS (obj): returns OCS object from kind and name.
+
+    """
+    ocp_block_object = OCP(kind=kind, resource_name=resource_name).get()
+    return OCS(**ocp_block_object)
+
+
+def remove_ocs_object_from_list(kind, resource_name, object_list):
+    """
+    Given a list of OCS objects, the function removes the object with kind and resource from the list
+
+    Args:
+        kind (str): resource kind like CephBlockPool, pvc.
+        resource_name (str): name of the resource.
+        object_list (array): Array of OCS objects.
+
+    Returns:
+        (array): Array of OCS objects without removed object.
+
+    """
+
+    for obj in object_list:
+        if obj.name == resource_name and obj.kind == kind:
+            object_list.remove(obj)
+            return object_list
 
 
 def get_all_storageclass_names():
