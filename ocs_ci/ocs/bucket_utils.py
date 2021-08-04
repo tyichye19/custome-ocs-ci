@@ -152,6 +152,7 @@ def sync_object_directory(podobj, src, target, s3_obj=None, signed_request_creds
     """
     logger.info(f"Syncing all objects and directories from {src} to {target}")
     retrieve_cmd = f"sync {src} {target}"
+
     if s3_obj:
         secrets = [s3_obj.access_key_id, s3_obj.access_key, s3_obj.s3_internal_endpoint]
     elif signed_request_creds:
@@ -162,6 +163,7 @@ def sync_object_directory(podobj, src, target, s3_obj=None, signed_request_creds
         ]
     else:
         secrets = None
+    logger.info(secrets)
     podobj.exec_cmd_on_pod(
         command=craft_s3_command(
             retrieve_cmd, s3_obj, signed_request_creds=signed_request_creds
@@ -1307,3 +1309,37 @@ def get_bucket_available_size(mcg_obj, bucket_name):
     resp = bucket_read_api(mcg_obj, bucket_name)
     bucket_size = resp["storage"]["values"]["free"]
     return bucket_size
+
+
+def get_objects(podobj, src,  s3_obj=None, signed_request_creds=None):
+    """
+    Get objects from buckets
+
+    Args:
+        podobj (OCS): The pod on which to execute the commands and download the objects to
+        src (str): Fully qualified object source path
+        target (str): Fully qualified object target path
+        s3_obj (MCG, optional): The MCG object to use in case the target or source
+                                 are in an MCG
+        signed_request_creds (dictionary, optional): the access_key, secret_key,
+            endpoint and region to use when willing to send signed aws s3 requests
+    """
+    retrieve_cmd = f"ls {src} --recursive "
+
+    if s3_obj:
+        secrets = [s3_obj.access_key_id, s3_obj.access_key, s3_obj.s3_internal_endpoint]
+    elif signed_request_creds:
+        secrets = [
+            signed_request_creds.get("access_key_id"),
+            signed_request_creds.get("access_key"),
+            signed_request_creds.get("endpoint"),
+        ]
+    else:
+        secrets = None
+    logger.info(secrets)
+    logger.info(podobj.exec_cmd_on_pod(
+        command=craft_s3_command(
+            retrieve_cmd, s3_obj, signed_request_creds=signed_request_creds
+        ),
+        out_yaml_format=False,
+        secrets=secrets))
