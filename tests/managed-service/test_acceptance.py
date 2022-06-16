@@ -9,7 +9,7 @@ from ocs_ci.helpers import helpers
 logger = logging.getLogger(__name__)
 
 
-class TestAcceptanceMS(ManageTest):
+class TestAcceptance(ManageTest):
     """
     Acceptance test Managed Service
 
