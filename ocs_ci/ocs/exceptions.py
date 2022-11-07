@@ -582,3 +582,11 @@ class LVMOHealthException(Exception):
 
 class VolumesExistError(Exception):
     pass
+
+
+class BlockPoolRawCapacityNotCorrect(Exception):
+    pass
+
+
+class BlockPoolRawCapacityNotLoaded(Exception):
+    pass
