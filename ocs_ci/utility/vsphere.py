@@ -977,7 +977,11 @@ class VSPHERE(object):
         for each in vmlist:
             if hasattr(each, "childEntity"):
                 for vm in each.childEntity:
-                    vms.append(vm)
+                    if hasattr(vm, "childEntity"):
+                        for vm2 in vm.childEntity:
+                            vms.append(vm2)
+                    else:
+                        vms.append(vm)
             else:
                 # Direct VMs created in cluster
                 # This are the VMs created directly on cluster
