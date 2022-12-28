@@ -2764,6 +2764,36 @@ class VMWareUPINodes(VMWareNodes):
 
     def __init__(self):
         super().__init__()
+    
+    
+    def get_vms(self, nodes):
+        """
+        Get vSphere vm objects list in the Datacenter(and not just in the cluster scope).
+        Note: If one of the nodes failed with an exception, it will not return his
+        corresponding VM object.
+
+        Args:
+            nodes (list): The OCS objects of the nodes
+
+        Returns:
+            list: vSphere vm objects list in the Datacenter
+
+        """
+        vms_in_dc = self.vsphere.get_all_vms_in_dc(self.datacenter)
+        node_names = set([node.name for node in nodes])
+        vms = []
+        for vm in vms_in_dc:
+            try:
+                vm_name = vm.name
+                if vm_name in node_names:
+                    vms.append(vm)
+            except Exception as e:
+                logger.info(f"Failed to get the vm name due to exception: {e}")
+
+        if len(vms) < len(nodes):
+            logger.warning("Didn't find all the VM objects for all the nodes")
+
+        return vms
 
     def terminate_nodes(self, nodes, wait=True):
         """
