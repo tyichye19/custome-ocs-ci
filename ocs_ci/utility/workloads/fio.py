@@ -69,7 +69,9 @@ def run(**kwargs):
     st_type = kwargs.pop("type")
     path = kwargs.pop("path")
     timeout = kwargs.get("timeout", 600)  # default timeout for the FIO test
-
+    
+    timeout = 900 # remove this line to define timeout by templates/workloads/fio/workload_io.yaml
+    
     fio_cmd = "fio"
     args = ""
     for k, v in kwargs.items():
