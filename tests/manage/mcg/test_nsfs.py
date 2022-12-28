@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 @skipif_mcg_only
 @skipif_ocs_version("<4.10")
+@pytest.mark.skip(reason="Tal - Issue 6741")
 class TestNSFSObjectIntegrity(MCGTest):
     """
     Test the integrity of IO operations on NSFS buckets
