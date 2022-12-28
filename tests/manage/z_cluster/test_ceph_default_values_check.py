@@ -96,6 +96,7 @@ class TestCephDefaultValuesCheck(ManageTest):
         config.DEPLOYMENT.get("ceph_debug"),
         reason="Ceph was configured with customized values by ocs-ci so there is point in validating its config values",
     )
+    @pytest.mark.skip(reason="Tal - Issue 6411")
     def test_validate_ceph_config_values_in_rook_config_override(self):
         """
         Test case for comparing the cluster's config values of
