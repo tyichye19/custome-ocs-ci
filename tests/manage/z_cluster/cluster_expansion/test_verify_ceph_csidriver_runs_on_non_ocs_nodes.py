@@ -19,6 +19,9 @@ logger = logging.getLogger(__name__)
 @tier1
 @pytest.mark.polarion_id("OCS-2490")
 @pytest.mark.bugzilla("1794389")
+@pytest.mark.skip(
+    reason="Tal - this test is disable because we do not configure terraform on TLV clusters"
+)
 class TestCheckTolerationForCephCsiDriverDs(ManageTest):
     """
     Check toleration for Ceph CSI driver DS on non ocs node
