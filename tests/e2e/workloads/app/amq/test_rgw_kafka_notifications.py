@@ -34,6 +34,7 @@ log = logging.getLogger(__name__)
 @on_prem_platform_required
 @skipif_external_mode
 @pytest.mark.polarion_id("OCS-2514")
+@pytest.mark.skip(reason="Tal - this test is disable because rgw service is not available in TLV clusters")
 class TestRGWAndKafkaNotifications(E2ETest):
     """
     Test to verify rgw kafka notifications
