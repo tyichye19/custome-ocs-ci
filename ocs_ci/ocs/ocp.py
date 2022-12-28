@@ -275,6 +275,8 @@ class OCP(object):
                         f"{self.kind}, selector: {selector}, Error: {ex}"
                     )
                 retry -= 1
+                if "TLS" not in str(ex):
+                    retry -= 1
                 if not retry:
                     if not silent:
                         log.warning("Number of attempts to get resource reached!")
@@ -874,7 +876,7 @@ class OCP(object):
                 format
         """
 
-        return self.get_resource(resource_name, "STATUS")
+        return self.get_resource(resource_name, "STATUS", retry=5)
 
     def check_name_is_specified(self, resource_name=""):
         """
