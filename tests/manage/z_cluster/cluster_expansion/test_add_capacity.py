@@ -106,6 +106,9 @@ def add_capacity_test():
 @skipif_external_mode
 @skipif_ibm_power
 @skipif_managed_service
+@pytest.mark.skip(
+    reason="Tal - this test is disable because we do not configure terraform on TLV clusters"
+)
 class TestAddCapacity(ManageTest):
     """
     Automates adding variable capacity to the cluster
