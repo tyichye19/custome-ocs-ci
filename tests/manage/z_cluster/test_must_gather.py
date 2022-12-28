@@ -48,7 +48,7 @@ class TestMustGather(ManageTest):
                     skipif_ms_consumer,
                 ]
             ),
-            pytest.param(*["OTHERS"], marks=pytest.mark.polarion_id("OCS-1583")),
+            pytest.param(*["OTHERS"], marks=[pytest.mark.polarion_id("OCS-1583"), pytest.mark.skip(reason="Tal - Issue 6412")]),
         ],
     )
     @pytest.mark.skipif(
